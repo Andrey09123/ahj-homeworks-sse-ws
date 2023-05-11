@@ -1,93 +1,64 @@
-import http from "http";
-import express from "express";
-import WebSocket, { WebSocketServer } from "ws";
-import cors from "cors";
-import bodyParser from "body-parser";
-import * as crypto from "crypto";
+const WebSocket = require('ws');
+const { users }= require('./public/users');
+const User = require('./public/User');
+// Создание сервера WebSocket
+const server = new WebSocket.Server({ port: 7000 });
 
-const app = express();
+// Обработчик события 'connection'
+server.on('connection', (socket) => {
+  console.log('Client connected');
 
-app.use(cors());
-app.use(
-  bodyParser.json({
-    type(req) {
-      return true;
-    },
-  })
-);
-app.use((req, res, next) => {
-  res.setHeader("Content-Type", "application/json");
-  next();
-});
+  // Отправка приветственного сообщения клиенту
+  socket.send('Welcome to the WebSocket server!');
 
-const userState = [];
-app.post("/new-user", async (request, response) => {
-  if (Object.keys(request.body).length === 0) {
-    const result = {
-      status: "error",
-      message: "This name is already taken!",
-    };
-    response.status(400).send(JSON.stringify(result)).end();
-  }
-  const { name } = request.body;
-  const isExist = userState.find((user) => user.name === name);
-  if (!isExist) {
-    const newUser = {
-      id: crypto.randomUUID(),
-      name: name,
-    };
-    userState.push(newUser);
-    const result = {
-      status: "ok",
-      user: newUser,
-    };
-    response.send(JSON.stringify(result)).end();
-  } else {
-    const result = {
-      status: "error",
-      message: "This name is already taken!",
-    };
-    response.status(409).send(JSON.stringify(result)).end();
-  }
-});
+  // Обработчик события 'message'
+  socket.on('message', (message) => {
+    console.log(`Received message: ${message}`);
+    try {
+      const request = JSON.parse(message);
 
-const server = http.createServer(app);
-const wsServer = new WebSocketServer({ server });
-wsServer.on("connection", (ws) => {
-  ws.on("message", (msg, isBinary) => {
-    const receivedMSG = JSON.parse(msg);
-    console.dir(receivedMSG);
-    if (receivedMSG.type === "exit") {
-      const idx = userState.findIndex(
-        (user) => user.name === receivedMSG.user.name
-      );
-      userState.splice(idx, 1);
-      [...wsServer.clients]
-        .filter((o) => o.readyState === WebSocket.OPEN)
-        .forEach((o) => o.send(JSON.stringify(userState)));
-      return;
-    }
-    if (receivedMSG.type === "send") {
-      [...wsServer.clients]
-        .filter((o) => o.readyState === WebSocket.OPEN)
-        .forEach((o) => o.send(msg, { binary: isBinary }));
+      if (request.type === 'get_data') {
+        const responseData = {
+          // фактические данные, которые  отправляются клиенту
+          isFreeNickname: true,
+          nickname: request.data.nickname,
+          users: users
+        };
+        const user = users.find(user => user.nickname === request.data.nickname);
+
+        if (!user) {
+          const user = new User(request.data);
+          users.push(user);
+        }
+
+        if (user) {
+          responseData.isFreeNickname = false;
+        }
+
+        const response = {
+          type: 'data_response',
+          data: responseData,
+        };
+
+        socket.send(JSON.stringify(response));
+      } else  if (request.type === 'post_user_message') {
+        const user = users.find(user => user.nickname === request.data.nickname);
+        user.messages.push({ text: request.data.text, time: request.data.time });
+      }
+    } catch (error) {
+      console.error(`Error processing message: ${error}`);
     }
   });
-  [...wsServer.clients]
-    .filter((o) => o.readyState === WebSocket.OPEN)
-    .forEach((o) => o.send(JSON.stringify(userState)));
+
+  // Обработчик события 'close'
+  socket.on('close', () => {
+    console.log('Client disconnected');
+  });
+
+  // Обработчик события 'error'
+  socket.on('error', (error) => {
+    console.error(`Error: ${error}`);
+  });
 });
 
-const port = process.env.PORT || 3000;
-
-const bootstrap = async () => {
-  try {
-    server.listen(port, () =>
-      console.log(`Server has been started on http://localhost:${port}`)
-    );
-  } catch (error) {
-    console.error(error);
-  }
-};
-
-bootstrap();
+console.log('WebSocket server is running on port 7000');
