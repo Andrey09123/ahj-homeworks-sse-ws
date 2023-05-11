@@ -1,0 +1,194 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+}
+  
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f0f0f0;
+  color: #333;
+  padding: 20px;
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-content {
+  background-color: #fff;
+  margin: 15% auto 1% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+  max-width: 400px;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.nickname {
+  padding: 0.75rem;
+  border-radius: 10px;
+  margin-bottom: 0.5rem;
+}
+
+button {
+  background-color: #ecb5b5;
+  border: none;
+  border-radius: 10px;
+  color: rgb(34, 33, 33);
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+}
+
+input:focus::-webkit-input-placeholder {
+  color: transparent;
+}
+
+button:focus {
+  background-color: #742c2c;
+  color: whitesmoke;
+}
+
+button:focus, .nickname:focus {
+  border: 2px solid rgb(228, 82, 82)
+}
+
+button:hover, .nickname:hover {
+  border: 2px solid rgb(184, 123, 123)
+}
+
+.error-container {
+  display: block;
+  border: 1px solid #d12c2c;
+  padding: 2rem;
+  border-radius: 30px;
+  width: 80%;
+  background-color: white;
+  margin: auto;
+}
+
+/* .error-container_visible {
+  display: block;
+} */
+
+.chat-container {
+  display: flex;
+}
+
+ /* Стили для списка пользователей */
+.user-list {
+  width: 20%;
+  height: 400px;
+  background-color: #f2f2f2;
+  border: 1px solid black;
+  border-radius: 12px;
+}
+
+.user-list li {
+  list-style: none;
+  padding: 10px;
+  border-radius: 5px;
+  position: relative;
+}
+
+/* Стили для кружка перед элементом списка */
+.user-list li::before {
+  content: "";
+  right: 70px;
+  border: 1px solid black;
+  background-color: #f1eded;
+  border-radius: 50%;
+  display: block;
+  height: 20px;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+}
+
+.user-list li.active {
+  background-color: #4CAF50;
+  color: #fff;
+}
+
+/* Стили для окна чата */
+.chat-window {
+  width: 80%;
+  height: 400px;
+  padding: 10px;
+  background-color: #fff;
+  border: 1px solid black;
+  border-radius: 12px;
+}
+
+.messages {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0.5rem;
+  height: 85%;
+  padding: 10px;
+  overflow-y: scroll;
+}
+/* Стили для сообщений */
+.message {
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.message-info {
+  font-size: 0.8em;
+  color: #888;
+  display: flex;
+  justify-content: start;
+  margin-bottom: 5px;
+}
+
+.timestamp {
+  margin-left: 5px;
+}
+
+/* Стили для сообщений пользователя */
+.message-user {
+  align-self: flex-end;
+}
+
+.username {
+  color: red;
+  justify-content: end;
+}
+
+/* Стили для сообщений других пользователей */
+.message-other {
+  align-self: flex-start;
+}
+
+/* Стили для показа текущего пользователя */
+.you {
+  font-weight: bold;
+  color: red;
+}
+
+/* Стили для формы */
+
+.message-form input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 10px;
+}
