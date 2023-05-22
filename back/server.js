@@ -9,14 +9,15 @@ server.on('connection', (socket) => {
   console.log('Client connected');
 
   // Отправка приветственного сообщения клиенту
-  socket.send('Welcome to the WebSocket server!');
+  socket.send(JSON.stringify({data: "Welcome to the socket server"}));
 
   // Обработчик события 'message'
   socket.on('message', (message) => {
     console.log(`Received message: ${message}`);
-    try {
-      const request = JSON.parse(message);
-
+    try {      
+      
+      const request = JSON.parse(message.toString());
+     
       if (request.type === 'get_data') {
         const responseData = {
           // фактические данные, которые  отправляются клиенту
@@ -39,8 +40,9 @@ server.on('connection', (socket) => {
           type: 'data_response',
           data: responseData,
         };
-
+        
         socket.send(JSON.stringify(response));
+        
       } else  if (request.type === 'post_user_message') {
         const user = users.find(user => user.nickname === request.data.nickname);
         user.messages.push({ text: request.data.text, time: request.data.time });

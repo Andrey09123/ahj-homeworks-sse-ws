@@ -24,8 +24,10 @@ function displayError(errorMessage) {
 
 function handleMessage(event, socket) {
   try {
+      
     const response = JSON.parse(event.data);
-
+ 
+    
     if (response.type === 'data_response') {
       /* eslint-disable */
       console.log('Received data:', response.data);
@@ -33,6 +35,7 @@ function handleMessage(event, socket) {
         const container = document.querySelector('.chat-container');
         /* eslint-disable */
         const chat = new Chat(container, socket, response.data);
+        
       } else {
         displayError('Введенный ник уже занят, выберите другой.');
       }
