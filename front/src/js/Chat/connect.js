@@ -1,5 +1,7 @@
 import Chat from './Chat';
 
+let chatInstance;
+
 function handleOpen(event, socket, nickname) {
   /* eslint-disable */
   console.log('Connected to WebSocket server');
@@ -33,12 +35,14 @@ function handleMessage(event, socket) {
       console.log('Received data:', response.data);
       if (response.data.isFreeNickname) {
         const container = document.querySelector('.chat-container');
-        /* eslint-disable */
-        const chat = new Chat(container, socket, response.data);
+
+        chatInstance = new Chat(container, socket, response.data);
         
       } else {
         displayError('Введенный ник уже занят, выберите другой.');
       }
+    } else if (response.type === 'new_message') {
+      chatInstance.pushNewMessage(response.data)
     }
   } catch (error) {
     /* eslint-disable */
@@ -57,7 +61,7 @@ function handleError(event) {
 }
 
 export default function connect(nickname) {
-  const socket = new WebSocket('ws://localhost:7000');
+  const socket = new WebSocket('ws://localhost:7003');
 
   socket.addEventListener('open', (event) => handleOpen(event, socket, nickname));
   socket.addEventListener('message', (event) => handleMessage(event, socket));

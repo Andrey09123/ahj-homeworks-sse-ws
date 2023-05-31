@@ -2,7 +2,7 @@ const WebSocket = require('ws');
 const { users }= require('./public/users');
 const User = require('./public/User');
 // Создание сервера WebSocket
-const server = new WebSocket.Server({ port: 7000 });
+const server = new WebSocket.Server({ port: 7003 });
 
 // Обработчик события 'connection'
 server.on('connection', (socket) => {
@@ -45,7 +45,20 @@ server.on('connection', (socket) => {
         
       } else  if (request.type === 'post_user_message') {
         const user = users.find(user => user.nickname === request.data.nickname);
-        user.messages.push({ text: request.data.text, time: request.data.time });
+        const message = { text: request.data.text, time: request.data.time };
+        user.messages.push(message);
+        server.clients.forEach((client) => {
+          client.send(JSON.stringify(
+            {
+              type: 'new_message',
+              data: {
+                nickname: user.nickname,
+                ...message
+              }
+            }
+            )
+          )
+        })
       }
     } catch (error) {
       console.error(`Error processing message: ${error}`);

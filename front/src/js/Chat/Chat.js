@@ -68,10 +68,20 @@ export default class Chat {
     };
 
     handleSendMessage(this.socket, message);
-    this.addMessage(message); // код для добавления сообщения на страницу
+    // this.addMessage(message); // код для добавления сообщения на страницу
 
     // Очищаем поле ввода сообщения
     messageInput.value = '';
+  }
+
+  pushNewMessage(message) {
+    const user = this.users.find((u) => u.nickname === message.author);
+    if (!user) {
+      this.users.push({ nickname: message.author, messages: [message.message] });
+    } else {
+      user.messages.push(message.message);
+    }
+    this.addMessage(message);
   }
 
   addMessage(obj) {
